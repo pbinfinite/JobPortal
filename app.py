@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__, instance_relative_config=True)
 
-app.config.from_object(os.environ['APP_SETTINGS'])
+app.config.from_object(app.config)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
 db=SQLAlchemy(app)
 
