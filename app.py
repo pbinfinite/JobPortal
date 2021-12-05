@@ -87,9 +87,9 @@ def appl_for_job():
 def recdis():
     conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
     cur=conn.cursor()
-    cur.execute('select emp_name, emp_id from Recruiter where emp_id=2001;')
-    stat = cur.fetchone()
-    return stat
+    cur.execute('select emp_id, emp_name from Recruiter;')
+    recarr = cur.fetchall()
+    return render_template('rec_display.html', recarr=recarr)
 
 if __name__=='__main__':
     app.run(debug=True)
