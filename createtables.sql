@@ -1,3 +1,13 @@
+CREATE SEQUENCE IF NOT EXISTS Candidate_seq
+  start 1005
+  increment 1
+  OWNED BY Candidate.cand_id;
+
+CREATE SEQUENCE IF NOT EXISTS Recruiter_seq
+  start 2005
+  increment 1
+  OWNED BY Recruiter.emp_id;
+
 CREATE TABLE IF NOT EXISTS Login
 (
   login_username VARCHAR(25) NOT NULL,
@@ -9,9 +19,9 @@ CREATE TABLE IF NOT EXISTS Login
 CREATE TABLE IF NOT EXISTS Candidate
 (
   cand_id INT NOT NULL,
+  Cand_name VARCHAR(25) NOT NULL,
   Cand_email VARCHAR(40),
   Cand_address Varchar(255),
-  Cand_name VARCHAR(25) NOT NULL,
   Cand_phone BIGINT ,
   Cand_DOB date NOT NULL check(date_part('year',age(Cand_DOB))>=18),
   Cand_gender CHAR NOT NULL,
@@ -22,8 +32,8 @@ CREATE TABLE IF NOT EXISTS Candidate
 
 CREATE TABLE IF NOT EXISTS Recruiter
 (
-  emp_name VARCHAR(30) NOT NULL,
   emp_id INT NOT NULL,
+  emp_name VARCHAR(30) NOT NULL,
   emp_HQ VARCHAR(255) NOT NULL,
   emp_phone BIGINT,
   emp_email VARCHAR(40) NOT NULL,
