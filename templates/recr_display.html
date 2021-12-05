@@ -1,0 +1,21 @@
+<html>
+    <head></head>
+    <body>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for row in recarr %}
+                    <tr>
+                        <td>{{row[0]}}</td>
+                        <td>{{row[1]}}</td>
+                    </tr>
+                {% endfor %}      
+            </tbody>
+        </table>
+    </body>
+</html>
