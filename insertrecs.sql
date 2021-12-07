@@ -8,14 +8,14 @@ INSERT into Login values ('chandran_login','chandran_pwd','C');
 INSERT into Login values ('divya_login','divya_pwd','C');
 
 truncate table candidate cascade;
-INSERT into Candidate values (1001, 'arjun@gmail.com','arjun house address','Arjun', 9845011111,'2001-01-01','M','arjun_login');
-INSERT into Candidate values (1002, 'barsha@gmail.com','barsha house address','barsha', 9845022222,'2001-02-02','F','barsha_login');
-INSERT into Candidate values (1003, 'chandran@gmail.com','chandran house address','chandran', 9845033333,'2001-03-03','M','chandran_login');
-INSERT into Candidate values (1004, 'divya@gmail.com','divya house address','divya', 9845044444,'2001-03-03','F','divya_login');
+INSERT into Candidate values (1001,'Arjun', 'arjun@gmail.com','arjun house address', 9845011111,'2001-01-01','M','arjun_login');
+INSERT into Candidate values (1002, 'barsha','barsha@gmail.com','barsha house address', 9845022222,'2001-02-02','F','barsha_login');
+INSERT into Candidate values (1003,'chandran', 'chandran@gmail.com','chandran house address', 9845033333,'2001-03-03','M','chandran_login');
+INSERT into Candidate values (1004, 'divya','divya@gmail.com','divya house address', 9845044444,'2001-03-03','F','divya_login');
 
 truncate table recruiter cascade;
-INSERT into Recruiter values ('Alpha technologies',2001, 'Bangalore',08027271111,'alphatech@gmail.com','alpha_login');
-INSERT into Recruiter values ('Beta digital',2002, 'Chennai',04427272222,'betadigital@gmail.com','beta_login');
+INSERT into Recruiter values (2001,'Alpha technologies', 'Bangalore',08027271111,'alphatech@gmail.com','alpha_login');
+INSERT into Recruiter values (2002,'Beta digital', 'Chennai',04427272222,'betadigital@gmail.com','beta_login');
 
 truncate table Job_Profile cascade;
 insert into Job_Profile values (1,'Developer','FTE','Full stack engineer',2001,'BTech',2, 'JAVA');

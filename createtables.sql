@@ -1,12 +1,3 @@
-CREATE SEQUENCE IF NOT EXISTS Candidate_seq
-  start 1005
-  increment 1
-  OWNED BY Candidate.cand_id;
-
-CREATE SEQUENCE IF NOT EXISTS Recruiter_seq
-  start 2005
-  increment 1
-  OWNED BY Recruiter.emp_id;
 
 CREATE TABLE IF NOT EXISTS Login
 (
@@ -111,3 +102,13 @@ CREATE TABLE IF NOT EXISTS Resume_resume_skills
   PRIMARY KEY (resume_skills, resume_id),
   FOREIGN KEY (resume_id) REFERENCES Resume(resume_id) ON UPDATE CASCADE
 );
+
+CREATE SEQUENCE IF NOT EXISTS Candidate_seq
+  start 1005
+  increment 1
+  OWNED BY Candidate.cand_id;
+
+CREATE SEQUENCE IF NOT EXISTS Recruiter_seq
+  start 2005
+  increment 1
+  OWNED BY Recruiter.emp_id;
