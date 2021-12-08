@@ -192,7 +192,6 @@ def applyjob():
             l=list()
             for i in existing:
                 for j in i:
-                    print('J', type(j))
                     l.append(j)
             if apjob in l:
                 flash('Looks like you have already applied!')
