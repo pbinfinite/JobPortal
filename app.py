@@ -1,7 +1,10 @@
+from flask.helpers import flash
 import psycopg2
 from datetime import timedelta
 from flask import Flask, redirect, render_template, request, url_for
 from flask import session
+from datetime import date
+import time
 
 conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
 conn.autocommit=True
@@ -143,19 +146,25 @@ def candidate_home():
 
     conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
     cur=conn.cursor()
-    cur.execute('select job_name, job_type, job_description, emp_name, job_qualifications, job_experience, job_primary_skill from Job_Profile as j, Recruiter as r where j.recruiter_id=r.emp_id;')
+    cur.execute('select job_name, job_type, job_description, emp_name, job_qualifications, job_experience, job_primary_skill, job_id from Job_Profile as j, Recruiter as r where j.recruiter_id=r.emp_id;')
     recarr = cur.fetchall()
 
     if "user" in session:
         user = session["user"]
         int_sch='''select emp_name, job_name, int_date, int_type, int_result, int_remarks
         from interview as i, job_profile as j, recruiter as r, candidate as c, login as l
-        where i.int_job=j.job_id and i.candidateid=c.cand_id and j.recruiter_id=r.emp_id and c.cand_login_username=l.login_username and l.login_username='{}';'''
+        where i.int_job=j.job_id and i.candidateid=c.cand_id and j.recruiter_id=r.emp_id and c.cand_login_username=l.login_username and i.int_result!='PENDING' and l.login_username='{}';'''
         cur.execute(int_sch.format(user))
         interviewarr=cur.fetchall()
+
+        int_pending='''select emp_name, job_name, application_date 
+        from applications as a, recruiter as r, job_profile as j, login as l, candidate as c
+        where a.application_job_id=j.job_id and j.recruiter_id=r.emp_id and a.application_cand_id=c.cand_id and c.cand_login_username=l.login_username and l.login_username='{}';'''
+        cur.execute(int_pending.format(user))
+        pendingarr=cur.fetchall()
         conn.commit()
         cur.close()
-        return render_template('candidate_page.html', recarr=recarr, intv = interviewarr)
+        return render_template('candidate_page.html', recarr=recarr, intv = interviewarr, pending=pendingarr)
 
 @app.route('/home_rec', endpoint='rec_home', methods=['POST','GET'])
 def rec_home():
@@ -163,11 +172,69 @@ def rec_home():
 
 @app.route('/apply',endpoint='applyjob', methods=['GET','POST'])
 def applyjob():
-    return "applied"
+    if "user" in session:
+        print('here10')
+        user = session["user"]
+        if request.method=='POST':
+            applied=request.form
+            apjob=applied['jobid']
+            apjob=int(apjob)
+            conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
+            cur=conn.cursor()
+            cur.execute('select application_id from applications;')
+            ids=cur.fetchall()
+            new_id=int(ids[-1][0])+1
+            exist_appl='''select application_job_id 
+            from applications as a, candidate as c, login as l 
+            where a.application_cand_id=c.cand_id and c.cand_login_username=l.login_username and l.login_username='{}';'''
+            cur.execute(exist_appl.format(user))
+            existing=cur.fetchall()
+            l=list()
+            for i in existing:
+                for j in i:
+                    print('J', type(j))
+                    l.append(j)
+            if apjob in l:
+                flash('Looks like you have already applied!')
+            else:
+                cur.execute("select cand_id from candidate as c, login as l where c.cand_login_username=l.login_username and l.login_username='{}';".format(user))
+                candid=cur.fetchone()
+                insertappl='''insert into applications(application_id, application_job_id,application_date, application_cand_id) values (%s,%s,%s,%s);'''
+                cur.execute(insertappl,(new_id, apjob, date.today(), candid))
+                conn.commit()
+                cur.close()
+                conn.close()
+    return redirect('/home_cand')
 
 @app.route('/resume_edit', endpoint='edit_resume', methods=["GET","POST"])
 def edit_resume():
-    return "edit resume"
+    id=0
+    if "user" in session:
+        user = session["user"]
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
+        cur=conn.cursor()
+        edit_res='''select resume_name, resume_qualification, resume_experience, r.resume_id
+        from resume as r, candidate as c, login as l
+        where r.candidate_id=c.cand_id and c.cand_login_username=l.login_username and l.login_username='{}';'''
+        cur.execute(edit_res.format(user))
+        old_det=cur.fetchone()
+        id=old_det[3]
+        cur.execute("select resume_skills from Resume_resume_skills as s, resume as r where s.resume_id=r.resume_id and r.resume_id=%s;",(id,))
+        skill_old=cur.fetchall()
+
+    if request.method=="POST":
+        resume=request.form
+        name=resume["name"]
+        qualf = resume["qualf"]
+        expr = resume["expr"]
+        skills = resume["skills"]
+
+        cur.execute("update resume set resume_name=%s, resume_qualification=%s, resume_experience=%s where resume_id=%s;",(name, qualf, expr, id))
+        conn.commit()
+        cur.close()
+        return redirect('/home_cand')
+
+    return render_template('resume_edit.html', resume=old_det, oldsk=skill_old)
 
 @app.route('/profile_cand', endpoint='profile_cand', methods=["GET","POST"])
 def profile_cand():
@@ -194,17 +261,10 @@ def profile_cand():
     return render_template('profile_edit_cand.html', profile=old_details)
 #commented to add endpoint to all functions
 '''
-@app.route('/profile_cand')
-def profile_cand():
-    return "cand profile"
 
 @app.route('/profile_rec')
 def profile_rec():
     return "rec profile"
-
-@app.route('/home_cand')
-def candidate_home():
-    return "cand home"
 
 @app.route('/rec_home')
 def rec_home():
@@ -218,9 +278,6 @@ def add_job():
 def view_resume():
     return "view resume"
 
-@app.route('/resume_edit')
-def edit_resume():
-    return "edit resume"
 '''
 
 @app.route('/logout')
