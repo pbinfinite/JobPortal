@@ -30,11 +30,13 @@ app.secret_key = "DBMS"
 #session.pop("user", None)
 
 role_link='H'
+logged_user=''
 @app.route('/', endpoint = 'loginpage', methods = ['GET', 'POST'])
 def loginpage():
     #signup login for candidate and recruiter
     find = 0
     global role_link
+    global logged_user
     if request.method == 'POST':
         # retrieving the entries made in the login form
         loginDetails = request.form
@@ -42,6 +44,7 @@ def loginpage():
         password = loginDetails['password']
         role = loginDetails['role']
         role_link=role
+        logged_user=username
         print(username, password, role)
         conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
         cur=conn.cursor()
@@ -58,7 +61,7 @@ def loginpage():
     else: 
         if "user" in session:
             print('here')
-            return redirect('/home')
+            return redirect('/logout')
         return render_template('login.html', find = find)
 
 @app.route('/signup_cand', endpoint='singup_cand', methods = ['GET', 'POST'])
@@ -137,12 +140,58 @@ def homepage():
 
 @app.route('/home_cand', endpoint='candidate_home', methods=['POST','GET'])
 def candidate_home():
-    return "cand home"
+
+    conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
+    cur=conn.cursor()
+    cur.execute('select job_name, job_type, job_description, emp_name, job_qualifications, job_experience, job_primary_skill from Job_Profile as j, Recruiter as r where j.recruiter_id=r.emp_id;')
+    recarr = cur.fetchall()
+
+    if "user" in session:
+        user = session["user"]
+        int_sch='''select emp_name, job_name, int_date, int_type, int_result, int_remarks
+        from interview as i, job_profile as j, recruiter as r, candidate as c, login as l
+        where i.int_job=j.job_id and i.candidateid=c.cand_id and j.recruiter_id=r.emp_id and c.cand_login_username=l.login_username and l.login_username='{}';'''
+        cur.execute(int_sch.format(user))
+        interviewarr=cur.fetchall()
+        conn.commit()
+        cur.close()
+        return render_template('candidate_page.html', recarr=recarr, intv = interviewarr)
 
 @app.route('/home_rec', endpoint='rec_home', methods=['POST','GET'])
 def rec_home():
     return "rec home"
 
+@app.route('/apply',endpoint='applyjob', methods=['GET','POST'])
+def applyjob():
+    return "applied"
+
+@app.route('/resume_edit', endpoint='edit_resume', methods=["GET","POST"])
+def edit_resume():
+    return "edit resume"
+
+@app.route('/profile_cand', endpoint='profile_cand', methods=["GET","POST"])
+def profile_cand():
+    id=0
+    if "user" in session:
+        user = session["user"]
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
+        cur=conn.cursor()
+        cur.execute("select cand_name, cand_email, cand_address, cand_phone, cand_id from Candidate as c, Login as l where c.cand_login_username=l.login_username and l.login_username='{}';".format(user))
+        old_details=cur.fetchone()
+        id=old_details[4]
+
+    if request.method == 'POST':
+        profile=request.form
+        name=profile["name"]
+        email=profile["email"]
+        address=profile["address"]
+        phoneno=profile["phoneno"]
+        
+        cur.execute("update Candidate set cand_email=%s, cand_name=%s, cand_address=%s, cand_phone=%s where cand_id=%s;",(email, name, address,phoneno,id))
+        conn.commit()
+        cur.close()
+        return redirect('/home_cand')
+    return render_template('profile_edit_cand.html', profile=old_details)
 #commented to add endpoint to all functions
 '''
 @app.route('/profile_cand')
@@ -172,10 +221,7 @@ def view_resume():
 @app.route('/resume_edit')
 def edit_resume():
     return "edit resume"
-    
-@app.route('/apl_for_job')
-def appl_for_job():
-    return "appl for this job"'''
+'''
 
 @app.route('/logout')
 def logout():
