@@ -1,0 +1,65 @@
+<html>
+    <head></head>
+    <body>
+        <div>
+            <input type="button" value="Edit Profile" margin="20px" style="float: right;" onclick="location.href='/profile_cand'">
+            <input type="button" value="Edit Resume" margin="20px" style="float: right;" onclick="location.href='/resume_edit'">
+            <input type="button" value="Logout" margin="20px" style="float: right;" onclick="location.href='/logout'">
+            <table>
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Company</th>
+                    <th>Qualification</th>
+                    <th>Experience</th>
+                    <th>Skill Required</th>
+                    <th></th> 
+                </tr>
+                </thead>
+                <tbody>
+                    {% for row in recarr %}
+                        <tr>
+                            <td>{{row[0]}}</td>
+                            <td>{{row[1]}}</td>
+                            <td>{{row[2]}}</td>
+                            <td>{{row[3]}}</td>
+                            <td>{{row[4]}}</td>
+                            <td>{{row[5]}}</td>
+                            <td>{{row[6]}}</td>
+                            <td><input type="button" value="Apply" margin="20px" onclick="location.href='/apply'">
+                        </tr>
+                    {% endfor %}      
+                </tbody>
+            </table>
+        </br></br>
+        <table>
+            <thead>
+            <tr>
+                <th>Company</th>
+                <th>Job</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Result</th>
+                <th>Remarks</th>
+                <th></th> 
+            </tr>
+            </thead>
+            <tbody>
+                {% for row in intv %}
+                    <tr>
+                        <td>{{row[0]}}</td>
+                        <td>{{row[1]}}</td>
+                        <td>{{row[2]}}</td>
+                        <td>{{row[3]}}</td>
+                        <td>{{row[4]}}</td>
+                        <td>{{row[5]}}</td>
+                    </tr>
+                {% endfor %}      
+            </tbody>
+        </table>
+
+        </div>
+    </body>
+</html>
