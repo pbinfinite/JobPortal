@@ -112,3 +112,8 @@ CREATE SEQUENCE IF NOT EXISTS Recruiter_seq
   start 2005
   increment 1
   OWNED BY Recruiter.emp_id;
+
+CREATE SEQUENCE IF NOT EXISTS job_seq
+  start 5
+  increment 1
+  OWNED BY Job_Profile.job_id;
