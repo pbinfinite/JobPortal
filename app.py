@@ -206,6 +206,24 @@ def recruiter_jobs():
     else:
         return redirect(url_for('login'))
     
+@app.route('/rec_view_app', endpoint='recruiter_app', methods=['POST','GET'])
+def recruiter_app():
+    if "user" in session:
+        user = session["user"]
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
+        cur=conn.cursor()
+        cur.execute("SELECT * FROM Recruiter WHERE login_username = '{}'".format(user))
+        userdet = cur.fetchall()
+        name = userdet[0][1]
+        cur.execute("select j.job_id, job_name, application_date, Cand_name from Candidate as c, Applications as a, Recruiter as r, Job_Profile as j where r.login_username = '{}' and r.emp_id = j.recruiter_ID and j.job_id=a.application_job_id and a.application_cand_id = c.Cand_id;".format(user))
+        apps = cur.fetchall()
+        conn.commit()
+        cur.close()
+        conn.close()
+        return render_template('recruiter_app.html', apps = apps,name = name)
+    else:
+        return redirect(url_for('login'))
+    
 
 
 @app.route('/postjob', endpoint = 'postjob', methods = ['GET', 'POST'])

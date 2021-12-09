@@ -1,0 +1,19 @@
+{% extends "rec_navbar.html" %}
+{% block title %} Applications-JobPortal {% endblock %}>
+{% block content %}
+<br>
+<br>
+{% for app in apps %}
+<div class="card" style="margin: 5px 20px 5px;">
+  <h5 class="card-header">{{ app[1] }}</h5>
+  <div class="card-body">
+    <p class="card-title">Job ID : {{ app[0] }}</p>
+    <p class="card-title">Application Date : {{ app[2] }}</p>
+    <p class="card-text">Candidate Name : {{ app[3] }}</p>
+    
+  </div>
+</div>
+<br>
+{% endfor %}
+  
+{% endblock %}
