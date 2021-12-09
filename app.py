@@ -10,8 +10,7 @@ conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9
 conn.autocommit=True
 conn.set_isolation_level(0)
 cur=conn.cursor()
-print("cursor ",cur)
-dbcr='''
+printdbcr='''
 dropdb database if not exists jobportal;
 create database jobportal;
 '''
@@ -20,18 +19,15 @@ insertfile=open('./insertrecs.sql','r')
 
 cur.execute("select * from Login")
 login_data = cur.fetchall()
-print(login_data)            
 
 if login_data == []:
     cur.execute(createfile.read())
     cur.execute(insertfile.read())
     
 cur.close()
-print("cursor after close",cur)
 
 conn.commit()
 conn.close()
-print("cursor after end",cur)
 
 
 app=Flask(__name__,template_folder='templates')
@@ -54,7 +50,7 @@ def loginpage():
         role = loginDetails['role']
         role_link=role
         logged_user=username
-        print(username, password, role)
+        #print(username, password, role)
         conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
         cur=conn.cursor()
         find = cur.execute('Select * from Login where (login_username, user_password, login_user_type) = (%s, %s,%s) ', (username, password,role))
@@ -65,11 +61,11 @@ def loginpage():
     if find != 0:
         user = details[0][0]
         session["user"] = user
-        print(user)
+        #print(user)
         return redirect('/home')
     else: 
         if "user" in session:
-            print('here')
+            #print('here')
             return redirect('/logout')
         return render_template('login.html', find = find)
 
@@ -99,7 +95,7 @@ def signup_cand():
             cur.execute("INSERT INTO Candidate(cand_id, Cand_name, Cand_email,Cand_address, Cand_phone , Cand_DOB, Cand_gender, cand_login_username) VALUES (%s, %s, %s, %s, %s, %s, %s,%s)",(Cand_id, name, email, address,phone_num, DOB,gender,username))
             conn.commit()
             cur.close()
-            print('here')
+            #print('here')
             # go to login page on submit
             return redirect('/')
         else:
@@ -176,7 +172,7 @@ def candidate_home():
 def rec_home():
     if "user" in session:
         user = session["user"]
-        print(user)
+        #print(user)
         conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
         cur=conn.cursor()
         # selecting jobseeker details to display the name of the jobseeker on the home page who is currently logged in
@@ -224,7 +220,30 @@ def recruiter_app():
     else:
         return redirect(url_for('login'))
     
-
+@app.route('/rec_view_cand', endpoint='recruiter_cand', methods=['POST','GET'])
+def recruiter_cand():
+    if "user" in session:
+        user = session["user"]
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
+        cur=conn.cursor()
+        cur.execute("SELECT * FROM Recruiter WHERE login_username = '{}'".format(user))
+        userdet = cur.fetchall()
+        name = request.form['candname']
+        print(name)
+        cur.execute("select Cand_name, Cand_email,Cand_address, Cand_phone , Cand_DOB, Cand_gender, resume_qualification, resume_experience,resume_id from Resume as r, Candidate as c where r.Candidate_id = c.cand_id and c.Cand_name = '{}';".format(name))
+        candidate = cur.fetchone()
+        print(candidate)
+        rid = candidate[8]
+        print(rid)
+        cur.execute("select resume_skills from Resume_resume_skills as r where r.resume_id = '{}';".format(rid))
+        skills = cur.fetchall()
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        return render_template('Recruiter_candidate.html', candidate=candidate, skills = skills)
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/postjob', endpoint = 'postjob', methods = ['GET', 'POST'])
 def postjob():
@@ -256,7 +275,6 @@ def postjob():
             cur.execute("INSERT INTO Job_Profile(job_id,job_name, job_type, job_description,recruiter_ID, job_qualifications, job_experience, job_primary_skills) VALUES (%s, %s, %s, %s, %s,%s,%s,%s)",(job_id, name, type, description, recruiter_ID, qualification, experience, primaryskill))
             conn.commit()
             cur.close()
-            #print('here')
             return redirect('postjob.html')
         else:
             return render_template('postjob.html')

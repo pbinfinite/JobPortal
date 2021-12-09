@@ -1,0 +1,26 @@
+{% extends "rec_navbar.html" %}
+{% block title %} Jobs-JobPortal {% endblock %}>
+{% block content %}
+<!-- Search Jobs -->
+<br>
+<br>
+<div class="card" style="margin: 5px 20px 5px;">
+  <h5 class="card-header"> Candidate Details and Resume </h5>
+  <div class="card-body">
+    <p class="card-title">Name : {{ candidate[0] }}</p>
+    <p class="card-title">Email : {{ candidate[1] }}</p>
+    <p class="card-text">Contact : {{ candidate[3] }}</p>
+    <p class="card-text">Address : {{ candidate[2] }}</p>
+    <p class="card-text">DOB : {{ candidate[4] }}</p>
+    <p class="card-text">Gender : {{ candidate[5] }}</p>
+    <p class="card-text">Qualification : {{candidate[6] }}</p>
+    <p class="card-text">Experience : <br> {{ candidate[7] }}</p>
+    {% for skill in skills %}
+        <p class="card-title">Skills : {{ skill }}</p>
+    {% endfor %}
+
+  </div>
+</div>
+<br>
+  
+{% endblock %}

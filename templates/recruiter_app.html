@@ -10,7 +10,13 @@
     <p class="card-title">Job ID : {{ app[0] }}</p>
     <p class="card-title">Application Date : {{ app[2] }}</p>
     <p class="card-text">Candidate Name : {{ app[3] }}</p>
-    
+    <form action = "http://127.0.0.1:5000/rec_view_cand" method = "POST">
+        <div class="form-row">
+          <div class="col">
+          <button type="submit" name = "candname" value="{{app[3]}}" class="btn btn-dark" style="margin-right: 40px;"> View Details and Skills </button> 
+          </div>
+        </div>
+      </form>
   </div>
 </div>
 <br>
