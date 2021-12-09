@@ -4,19 +4,19 @@
         <div>
             <form method="POST">
                 <label>Name: 
-                    <input type="text" name="name" value={{profile[0]}}> 
+                    <input type="text" name="name" value={{resume[0]}}> 
                 </label>
                 <br/><br/>
-                <label>Email: 
-                    <input type="text" name="email" value={{profile[1]}}>
+                <label>Qualification: 
+                    <input type="text" name="qualf" value={{resume[1]}}>
                 </label>
                 <br/><br/>
-                <label>Address: 
-                    <input type="text" name="address"  value={{profile[2]}}>
+                <label>Experience: 
+                    <input type="text" name="expr"  value={{resume[2]}}>
                 </label>
                 <br/><br/>
-                <label>Phone number: 
-                    <input type="number" name="phoneno" value={{profile[3]}}>
+                <label>Skills: (Pending)
+                    <textarea rows="10" cols="10" name="skills">{{oldsk}}</textarea>
                 </label>
                 <br/><br/>
                 <input type="submit" value="Submit"/>
