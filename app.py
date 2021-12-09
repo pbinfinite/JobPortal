@@ -228,7 +228,7 @@ def edit_resume():
     id=0
     if "user" in session:
         user = session["user"]
-        conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
         cur=conn.cursor()
         edit_res='''select resume_name, resume_qualification, resume_experience, r.resume_id
         from resume as r, candidate as c, login as l
@@ -258,6 +258,12 @@ def edit_resume():
             if i not in l:
                 print('skill: ', i)
                 cur.execute("insert into resume_resume_skills(resume_id, resume_skills) values (%s,%s);",(id, i))
+
+        old_sk=set(l)
+        new_sk=set(skills)
+        removedsk=old_sk-new_sk
+        for i in removedsk:
+            cur.execute("delete from resume_resume_skills where resume_skills=%s and resume_id=%s;",(i,id))
 
         cur.execute("update resume set resume_name=%s, resume_qualification=%s, resume_experience=%s where resume_id=%s;",(name, qualf, expr, id))
         conn.commit()
