@@ -281,6 +281,36 @@ def postjob():
     else:
         return render_template('login.html')
 
+@app.route('/postinterview', endpoint = 'postinterview', methods = ['GET', 'POST'])
+def postinterview():
+    if "user" in session:
+        if request.method == 'POST':
+            user = session["user"]
+            conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
+            cur=conn.cursor()
+            
+            userDetails = request.form
+            jobid = userDetails['jobid']
+            type = userDetails['type']
+            date = userDetails['date']
+            results = "pending"
+            remarks = "pending"
+            candid = userDetails['candid']
+            # checking if the password entered in both the fields are same
+            conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
+            cur=conn.cursor()
+            # creating a record by inserting the jobseeker details in jobseeker entity
+            cur.execute("select nextval('interview_seq')")
+            int_id = cur.fetchone()
+            
+            cur.execute("INSERT INTO Interview(int_id,int_job,int_date, int_result, int_remarks, int_type, candidate_ID) VALUES (%s, %s, %s, %s, %s,%s,%s)",(int_id, jobid,date, results, remarks, type, candid))
+            conn.commit()
+            cur.close()
+            return redirect('postinterview.html')
+        else:
+            return render_template('postinterview.html')
+    else:
+        return render_template('login.html')
 
 @app.route('/apply',endpoint='applyjob', methods=['GET','POST'])
 def applyjob():
@@ -417,30 +447,30 @@ def profile_rec():
         return redirect('/home_rec')
     return render_template('profile_edit_rec.html', profile_data=old_details)
 
-'''
-
-@app.route('/addjob')
-def add_job():
-    return "adding new job appl"
-
-@app.route('/resume_view')
-def view_resume():
-    return "view resume"
-
-'''
+@app.route('/update_int', endpoint='update_int', methods=['POST','GET'])
+def update_int():
+    '''if "user" in session:
+        user = session["user"]
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
+        cur=conn.cursor()
+        cur.execute("SELECT * FROM Recruiter WHERE login_username = '{}'".format(user))
+        userdet = cur.fetchall()
+        name = userdet[0][1]
+        cur.execute("select j.job_id, job_name, job_type, job_description, job_qualifications, job_experience, job_primary_skill, job_location, job_vacancy from Job_Profile as j, Job_Profile_job_location as l, Recruiter as r where r.login_username = '{}' and r.emp_id = j.recruiter_ID and j.job_id=l.job_id;".format(user))
+        jobs = cur.fetchall()
+        conn.commit()
+        cur.close()
+        conn.close()
+        return render_template('recruiter_jobs.html', jobs = jobs,name = name)
+    else:
+        return redirect(url_for('login'))'''
+    return "view/update interviews"
 
 @app.route('/logout')
 def logout():
     session.pop("user", None)
     return redirect('/')
 
-@app.route('/rec', endpoint='recdis')
-def recdis():
-    conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
-    cur=conn.cursor()
-    cur.execute('select emp_id, emp_name from Recruiter;')
-    recarr = cur.fetchall()
-    return render_template('recr_display.html', recarr=recarr)
 
 if __name__=='__main__':
     app.run(debug=True)

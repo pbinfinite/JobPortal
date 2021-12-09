@@ -117,3 +117,8 @@ CREATE SEQUENCE IF NOT EXISTS job_seq
   start 5
   increment 1
   OWNED BY Job_Profile.job_id;
+
+CREATE SEQUENCE IF NOT EXISTS interview_seq
+  start 105
+  increment 1
+  OWNED BY Interview.int_id;

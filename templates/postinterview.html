@@ -1,0 +1,41 @@
+{% extends "rec_navbar.html" %}
+{% block title %} Jobs-JobPortal {% endblock %}
+{% block content %} 
+<br>
+<div class="card border-dark mb-3" style="max-width: 80rem; margin-left: 30px; margin-right: 30px;">
+  <div class="card-header"><h4>Schedule an Interview</h4></div>
+  <div class="card-body text-dark">
+    <form action = "http://127.0.0.1:5000/update_int" method = "POST">
+      <div class="form-group">
+        <label for="exampleFormControlInput1">Job Title -</label>
+        <input type="text" class="form-control" name="name" placeholder="Enter the job title" >
+      </div>
+      <div class="form-group">
+        <label for="exampleFormControlInput1">Job ID - </label>
+        <input type="text" class="form-control" name="jobid" placeholder="Enter the job ID" >
+      </div>
+      <div class="form-group">
+        <label for="exampleFormControlInput1">Interview Type -</label>
+        <input type="text" class="form-control" name="type" placeholder="Enter the interview type - Online/offline" >
+      </div>
+      <div class="form-group">
+        <label for="exampleFormControlInput1">Interview Date -</label>
+        <input type="text" class="form-control" name="date" placeholder="Enter the interview date" >
+      </div>
+      <div class="form-group">
+        <label for="exampleFormControlInput1">Candidate ID -</label>
+        <input type="text" class="form-control" name="candid" placeholder="Enter the Candidate ID" >
+      </div>
+      <div class="form-group">
+        <label for="exampleFormControlInput1">Candidate Name -</label>
+        <input type="text" class="form-control" name="candname" placeholder="Enter the name of the candidate" >
+      </div>
+      <div class="form-group">
+          <input type="submit" value = "Submit" class="btn btn-dark">
+        </div>
+        
+      </form>
+  </div>
+</div>
+
+{% endblock %}
