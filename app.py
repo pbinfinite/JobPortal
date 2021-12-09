@@ -217,7 +217,7 @@ def postjob():
             cur=conn.cursor()
             
             userDetails = request.form
-            #name = userDetails['name']
+            name = userDetails['name']
             type = userDetails['type']
             qualification = userDetails['qualification']
             experience = userDetails['experience']
