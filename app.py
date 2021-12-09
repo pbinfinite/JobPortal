@@ -197,7 +197,7 @@ def applyjob():
             applied=request.form
             apjob=applied['jobid']
             apjob=int(apjob)
-            conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
+            conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
             cur=conn.cursor()
             cur.execute('select application_id from applications;')
             ids=cur.fetchall()
@@ -228,7 +228,7 @@ def edit_resume():
     id=0
     if "user" in session:
         user = session["user"]
-        conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
         cur=conn.cursor()
         edit_res='''select resume_name, resume_qualification, resume_experience, r.resume_id
         from resume as r, candidate as c, login as l
@@ -262,6 +262,7 @@ def profile_cand():
         cur=conn.cursor()
         cur.execute("select cand_name, cand_email, cand_address, cand_phone, cand_id from Candidate as c, Login as l where c.cand_login_username=l.login_username and l.login_username='{}';".format(user))
         old_details=cur.fetchone()
+        print(old_details)
         id=old_details[4]
 
     if request.method == 'POST':
@@ -304,13 +305,6 @@ def profile_rec():
     return render_template('profile_edit_rec.html', profile_data=old_details)
 
 '''
-@app.route('/home_cand')
-def candidate_home():
-    return "cand home"
-
-@app.route('/rec_home')
-def rec_home():
-    return "rec home"
 
 @app.route('/addjob')
 def add_job():
