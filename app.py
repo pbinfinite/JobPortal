@@ -238,6 +238,12 @@ def edit_resume():
         id=old_det[3]
         cur.execute("select resume_skills from Resume_resume_skills as s, resume as r where s.resume_id=r.resume_id and r.resume_id=%s;",(id,))
         skill_old=cur.fetchall()
+        l=list()
+        stringsk=''
+        for i in skill_old:
+            for j in i:
+                l.append(j)
+                stringsk=stringsk+j+','
 
     if request.method=="POST":
         resume=request.form
@@ -245,13 +251,20 @@ def edit_resume():
         qualf = resume["qualf"]
         expr = resume["expr"]
         skills = resume["skills"]
+        skills=skills.split(',')
+        print('skills',skills)
+        
+        for i in skills:
+            if i not in l:
+                print('skill: ', i)
+                cur.execute("insert into resume_resume_skills(resume_id, resume_skills) values (%s,%s);",(id, i))
 
         cur.execute("update resume set resume_name=%s, resume_qualification=%s, resume_experience=%s where resume_id=%s;",(name, qualf, expr, id))
         conn.commit()
         cur.close()
         return redirect('/home_cand')
 
-    return render_template('resume_edit.html', resume=old_det, oldsk=skill_old)
+    return render_template('resume_edit.html', resume=old_det, oldsk=stringsk)
 
 @app.route('/profile_cand', endpoint='profile_cand', methods=["GET","POST"])
 def profile_cand():
