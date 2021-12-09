@@ -3,26 +3,32 @@ from datetime import timedelta
 from flask import Flask, redirect, render_template, request, url_for
 from flask import session
 
-conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
+conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
 conn.autocommit=True
 conn.set_isolation_level(0)
 cur=conn.cursor()
-
+print("cursor ",cur)
 dbcr='''
 dropdb database if not exists jobportal;
 create database jobportal;
 '''
 createfile = open('./createtables.sql','r')
-
 insertfile=open('./insertrecs.sql','r')
 
+cur.execute("select * from Login")
+login_data = cur.fetchall()
+print(login_data)            
 
-
-cur.execute(createfile.read())
-cur.execute(insertfile.read())
+if login_data == []:
+    cur.execute(createfile.read())
+    cur.execute(insertfile.read())
+    
 cur.close()
+print("cursor after close",cur)
+
 conn.commit()
 conn.close()
+print("cursor after end",cur)
 
 
 app=Flask(__name__,template_folder='templates')
@@ -46,7 +52,7 @@ def loginpage():
         role_link=role
         logged_user=username
         print(username, password, role)
-        conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
         cur=conn.cursor()
         find = cur.execute('Select * from Login where (login_username, user_password, login_user_type) = (%s, %s,%s) ', (username, password,role))
         # selecting email and password attributes from jobseeker entity to check if the email and its password exists in the entity
@@ -81,7 +87,7 @@ def signup_cand():
         cpassword = userDetails['cpassword']
         # checking if the password entered in both the fields are same
         if password == cpassword and role == 'C':
-            conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
+            conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
             cur=conn.cursor()
             # creating a record by inserting the jobseeker details in jobseeker entity
             cur.execute("INSERT INTO Login(login_username, user_password, login_user_type) VALUES (%s, %s, %s)",(username, password, role))
@@ -112,7 +118,7 @@ def signup_rec():
         cpassword = userDetails['cpassword']
         # checking if the password entered in both the fields are same
         if password == cpassword and role == 'R':
-            conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
+            conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
             cur=conn.cursor()
             # creating a record by inserting the jobseeker details in jobseeker entity
             cur.execute("INSERT INTO Login(login_username, user_password, login_user_type) VALUES (%s, %s, %s)",(username, password, role))
@@ -141,7 +147,7 @@ def homepage():
 @app.route('/home_cand', endpoint='candidate_home', methods=['POST','GET'])
 def candidate_home():
 
-    conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
+    conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
     cur=conn.cursor()
     cur.execute('select job_name, job_type, job_description, emp_name, job_qualifications, job_experience, job_primary_skill from Job_Profile as j, Recruiter as r where j.recruiter_id=r.emp_id;')
     recarr = cur.fetchall()
@@ -159,7 +165,19 @@ def candidate_home():
 
 @app.route('/home_rec', endpoint='rec_home', methods=['POST','GET'])
 def rec_home():
-    return "rec home"
+    if "user" in session:
+        user = session["user"]
+        print(user)
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
+        cur=conn.cursor()
+        # selecting jobseeker details to display the name of the jobseeker on the home page who is currently logged in
+        cur.execute("SELECT * FROM Recruiter WHERE login_username = '{}'".format(user))
+        userdet = cur.fetchall()
+        name = userdet[0][1]
+        return render_template('recruiter_home.html', name = name)
+    else:
+        return redirect(url_for('login'))
+    
 
 @app.route('/apply',endpoint='applyjob', methods=['GET','POST'])
 def applyjob():
@@ -174,7 +192,7 @@ def profile_cand():
     id=0
     if "user" in session:
         user = session["user"]
-        conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
         cur=conn.cursor()
         cur.execute("select cand_name, cand_email, cand_address, cand_phone, cand_id from Candidate as c, Login as l where c.cand_login_username=l.login_username and l.login_username='{}';".format(user))
         old_details=cur.fetchone()
@@ -193,15 +211,33 @@ def profile_cand():
         return redirect('/home_cand')
     return render_template('profile_edit_cand.html', profile=old_details)
 #commented to add endpoint to all functions
-'''
-@app.route('/profile_cand')
-def profile_cand():
-    return "cand profile"
 
-@app.route('/profile_rec')
+
+@app.route('/profile_rec',endpoint='profile_rec', methods=["GET","POST"])
 def profile_rec():
-    return "rec profile"
+    id=0
+    if "user" in session:
+        user = session["user"]
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
+        cur=conn.cursor()
+        cur.execute("select emp_id, emp_name, emp_HQ, emp_phone, emp_email from Recruiter as r, Login as l where r.login_username=l.login_username and l.login_username='{}';".format(user))
+        old_details=cur.fetchone()
+        id=old_details[0]
 
+    if request.method == 'POST':
+        profile=request.form
+        name=profile["name"]
+        email=profile["email"]
+        address=profile["address"]
+        phoneno=profile["phoneno"]
+        
+        cur.execute("update Recruiter set emp_email=%s, emp_name=%s, emp_HQ=%s, emp_phone=%s where emp_id=%s;",(email, name, address,phoneno,id))
+        conn.commit()
+        cur.close()
+        return redirect('/home_rec')
+    return render_template('profile_edit_rec.html', profile_data=old_details)
+
+'''
 @app.route('/home_cand')
 def candidate_home():
     return "cand home"
@@ -230,7 +266,7 @@ def logout():
 
 @app.route('/rec', endpoint='recdis')
 def recdis():
-    conn=psycopg2.connect(database='jobportal', user='postgres', password='pb1sql', port=5432, host='127.0.0.1')
+    conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
     cur=conn.cursor()
     cur.execute('select emp_id, emp_name from Recruiter;')
     recarr = cur.fetchall()
