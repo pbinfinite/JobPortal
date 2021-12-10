@@ -1,0 +1,47 @@
+{% extends "rec_navbar.html" %}
+{% block title %} Interviews-JobPortal {% endblock %}>
+{% block content %}
+<!-- Search Jobs -->
+<br>
+<div class="card" style="margin: 5px 20px 5px;">
+  <h5 class="card-header">{{ details[1] }}</h5>
+  <div class="card-body">
+    <p class="card-title">Job ID : {{ details[0] }}</p>
+    <form action = "http://127.0.0.1:5000/update_job" id = "{{details[0]}}" method = "POST">
+        <div class="form-group">
+            <label for="exampleFormControlInput1"> Type -</label>
+            <input type="text" class="form-control" name="type" value = "{{details[2]}}" placeholder="Enter the interview type - Online/offline" >
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlInput1">Required Qualifications -</label>
+            <input type="text" class="form-control" name="qualification" value = "{{details[4]}}" placeholder="Enter the interview date" >
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlInput1">Work Experience -</label>
+            <input type="text" class="form-control" name="experience" value = "{{details[5]}}" placeholder="Enter the interview Result" >
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlInput1">Primary skill -</label>
+            <input type="text" class="form-control" name="skill" value = "{{details[6]}}" placeholder="Enter the interview remarks" >
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlInput1">Job Location -</label>
+            <input type="text" class="form-control" name="location" value = "{{details[7]}}" placeholder="Enter the interview remarks" >
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlInput1">Job Vacancies -</label>
+            <input type="text" class="form-control" name="vacancy" value = "{{details[8]}}" placeholder="Enter the interview remarks" >
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlInput1">Job Description -</label>
+            <input type="text" class="form-control" name="description" value = "{{details[3]}}" placeholder="Enter the interview remarks" >
+          </div>
+          <div class="form-group">
+            <input type="submit" value = "Update" class="btn btn-dark">
+          </div>
+        </div>
+      </form>
+  </div>
+</div>
+<br>
+{% endblock %}

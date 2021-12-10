@@ -16,7 +16,10 @@
     <p class="card-text">Location : {{ job[7] }}</p>
     <p class="card-text">Vacancy : {{ job[8] }}</p>
     <p class="card-text">Job Description : <br> {{ job[3] }}</p>
-
+    <form action="http://127.0.0.1:5000/rec_view_jobs" method = "POST">
+      <input type="hidden" name='j_id' value = "{{ job[0] }}">
+      <input type = "submit" id = "update" value = "Update" class = "btn btn-dark">
+    </form>
   </div>
 </div>
 <br>

@@ -183,9 +183,10 @@ def rec_home():
     else:
         return redirect(url_for('login'))
     
-    
+job_id = 0    
 @app.route('/rec_view_jobs', endpoint='recruiter_jobs', methods=['POST','GET'])
 def recruiter_jobs():
+    global job_id
     if "user" in session:
         user = session["user"]
         conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
@@ -198,9 +199,50 @@ def recruiter_jobs():
         conn.commit()
         cur.close()
         conn.close()
+        
+        if request.method == 'POST':
+            job_id = request.form.get('j_id')
+            return redirect(url_for('update_job', job_id = job_id))  
+        
         return render_template('recruiter_jobs.html', jobs = jobs,name = name)
     else:
         return redirect(url_for('login'))
+    
+@app.route('/update_job', endpoint='update_job', methods=['POST','GET'])
+def update_job():
+    if "user" in session:
+        user = session["user"]
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
+        cur=conn.cursor()
+        cur.execute("SELECT * FROM Recruiter WHERE login_username = '{}'".format(user))
+        userdet = cur.fetchall()
+        name = userdet[0][1]
+         
+        cur.execute("select j.job_id, job_name, job_type, job_description, job_qualifications, job_experience, job_primary_skill, job_location, job_vacancy from Job_Profile as j, Job_Profile_job_location as l, Recruiter as r where r.login_username = '{}' and r.emp_id = j.recruiter_ID and j.job_id=l.job_id and j.job_id = '{}';".format(user,job_id))
+        old_details = cur.fetchall()
+        loc = old_details[0][7]
+        
+        if request.method == 'POST':
+            profile=request.form
+            print(profile)
+            type = profile["type"]
+            description=profile["description"]
+            qualification =profile["qualification"]
+            experience =profile["experience"]
+            skill =profile["skill"]
+            location =profile["location"]
+            vacancy =profile["vacancy"]
+            cur.execute("update Job_Profile set job_type=%s, job_description=%s, job_qualifications=%s, job_experience=%s, job_primary_skill = %s where job_id = '{}';".format(job_id),(type,description,qualification,experience,skill))
+            cur.execute("update Job_Profile_job_location set job_location=%s, job_vacancy=%s where job_id = '{}'  and job_location = '{}';".format(job_id,loc),(location,vacancy))
+            conn.commit()
+            cur.close()
+            return redirect("/home_rec")
+        return render_template('update_jobs.html', details = old_details[0])
+    else:
+        return redirect(url_for('login'))
+    
+    return render_template('update_jobs.html')    
+
     
 @app.route('/rec_view_app', endpoint='recruiter_app', methods=['POST','GET'])
 def recruiter_app():
