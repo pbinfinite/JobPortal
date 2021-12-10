@@ -447,25 +447,63 @@ def profile_rec():
         return redirect('/home_rec')
     return render_template('profile_edit_rec.html', profile_data=old_details)
 
-@app.route('/update_int', endpoint='update_int', methods=['POST','GET'])
-def update_int():
-    '''if "user" in session:
+int_id = 0
+
+@app.route('/view_int', endpoint='view_int', methods=['POST','GET'])
+def view_int():
+    global int_id
+    if "user" in session:
         user = session["user"]
         conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
         cur=conn.cursor()
         cur.execute("SELECT * FROM Recruiter WHERE login_username = '{}'".format(user))
         userdet = cur.fetchall()
         name = userdet[0][1]
-        cur.execute("select j.job_id, job_name, job_type, job_description, job_qualifications, job_experience, job_primary_skill, job_location, job_vacancy from Job_Profile as j, Job_Profile_job_location as l, Recruiter as r where r.login_username = '{}' and r.emp_id = j.recruiter_ID and j.job_id=l.job_id;".format(user))
-        jobs = cur.fetchall()
+        cur.execute("select int_id,int_job,j.job_name,i.CandidateID, c.Cand_name, int_type ,int_date, int_result, int_remarks from Interview as i, Job_Profile as j, Candidate as c, Recruiter as r where  r.login_username = '{}' and c.cand_id = i.CandidateID and r.emp_id = j.recruiter_ID and j.job_id=i.int_job;".format(user))
+        old_details = cur.fetchall()
         conn.commit()
         cur.close()
         conn.close()
-        return render_template('recruiter_jobs.html', jobs = jobs,name = name)
+        if request.method == 'POST':
+            int_id = request.form.get('j_id')
+            return redirect(url_for('update_int', int_id = int_id))  
+        
+        return render_template('viewinterviews.html', interviews= old_details,name = name)
+          
     else:
-        return redirect(url_for('login'))'''
-    return "view/update interviews"
-
+        return redirect(url_for('login'))
+    
+    
+@app.route('/update_int', endpoint='update_int', methods=['POST','GET'])
+def update_int():
+    if "user" in session:
+        user = session["user"]
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
+        cur=conn.cursor()
+        cur.execute("SELECT * FROM Recruiter WHERE login_username = '{}'".format(user))
+        userdet = cur.fetchall()
+        name = userdet[0][1]
+        cur.execute("select int_id,int_job,j.job_name,i.CandidateID, c.Cand_name, int_type ,int_date, int_result, int_remarks from Interview as i, Job_Profile as j, Candidate as c, Recruiter as r where  r.login_username = '{}' and c.cand_id = i.CandidateID and r.emp_id = j.recruiter_ID and j.job_id=i.int_job and i.int_id = '{}';".format(user,int_id))
+        old_details = cur.fetchall()
+        print(old_details)
+        
+        if request.method == 'POST':
+            profile=request.form
+            print(profile)
+            date = profile["date"]
+            type = profile["type"]
+            remarks=profile["remarks"]
+            result=profile["results"]
+            cur.execute("update Interview set int_date=%s, int_type=%s, int_remarks=%s, int_result=%s where int_id=%s;",(date,type,remarks,result,int_id))
+            conn.commit()
+            cur.close()
+            return redirect("/home_rec")
+        return render_template('update_results.html', details = old_details[0])
+    else:
+        return redirect(url_for('login'))
+    
+    return render_template('update_results.html')
+    
 @app.route('/logout')
 def logout():
     session.pop("user", None)

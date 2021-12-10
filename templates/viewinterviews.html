@@ -1,0 +1,25 @@
+{% extends "rec_navbar.html" %}
+{% block title %} Jobs-JobPortal {% endblock %}>
+{% block content %}
+<br><br>
+{% for int in interviews %}
+<div class="card" style="margin: 5px 20px 5px;">
+  <h5 class="card-header">{{ int[0] }}</h5>
+  <div class="card-body">
+    <p class="card-title">Job ID : {{ int[1] }}</p>
+    <p class="card-title">Job Name : {{ int[2] }}</p>
+    <p class="card-text">Candidate ID : {{ int[3] }}</p>
+    <p class="card-text">Candidate Name : {{ int[4]}}</p>
+    <p class="card-text">Type : {{ int[5]}}</p>
+    <p class="card-text">Date : {{ int[6]}}</p>
+    <p class="card-text">Result : {{ int[7]}}</p>
+    <p class="card-text">Remarks : {{ int[8]}}</p>
+    <form action="http://127.0.0.1:5000/view_int" method = "POST">
+      <input type="hidden" name='j_id' value = "{{ int[0] }}">
+      <input type = "submit" id = "update" value = "Update" class = "btn btn-dark">
+    </form>
+  </div>
+</div>
+<br>
+{% endfor %}
+{% endblock %}

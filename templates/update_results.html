@@ -1,0 +1,38 @@
+{% extends "rec_navbar.html" %}
+{% block title %} Interviews-JobPortal {% endblock %}>
+{% block content %}
+<!-- Search Jobs -->
+<br>
+<div class="card" style="margin: 5px 20px 5px;">
+  <h5 class="card-header">{{ details[0] }}</h5>
+  <div class="card-body">
+    <p class="card-title">Job ID : {{ details[1] }}</p>
+    <p class="card-title">Job Name : {{ details[2] }}</p>
+    <p class="card-text">Candidate ID : {{ details[3] }}</p>
+    <p class="card-text">Candidate Name : {{ details[4]}}</p>
+    <form action = "http://127.0.0.1:5000/update_int" id = "{{details[0]}}" method = "POST">
+        <div class="form-group">
+            <label for="exampleFormControlInput1">Interview Type -</label>
+            <input type="text" class="form-control" name="type" value = "{{details[5]}}" placeholder="Enter the interview type - Online/offline" >
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlInput1">Interview Date -</label>
+            <input type="text" class="form-control" name="date" value = "{{details[6]}}" placeholder="Enter the interview date" >
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlInput1">Interview Result -</label>
+            <input type="text" class="form-control" name="results" value = "{{details[7]}}" placeholder="Enter the interview Result" >
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlInput1">Interview Remarks -</label>
+            <input type="text" class="form-control" name="remarks" value = "{{details[8]}}" placeholder="Enter the interview remarks" >
+          </div>
+          <div class="form-group">
+            <input type="submit" value = "Update" class="btn btn-dark">
+          </div>
+        </div>
+      </form>
+  </div>
+</div>
+<br>
+{% endblock %}
