@@ -168,6 +168,46 @@ def candidate_jia():
         cur.close()
         return render_template('candidate_page.html', recarr=recarr, intv = interviewarr, pending=pendingarr)
 
+@app.route('/jobsearch', endpoint = 'jobsearch',  methods = ['GET', 'POST'])
+def jobsearch():
+    if "user" in session:
+        if request.method == 'POST':
+            searchjob = request.form
+            keyword = searchjob['keyword']
+            location = searchjob['location']
+            conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
+            cur=conn.cursor()
+            # if only keyword is entered in the job search, then select those jobs where the keyword matches the job details
+            # by using LIKE clause and inner join on jobs and corresponding companies 
+            if keyword and (not location):
+                count_search = cur.execute("select job_name, job_type, emp_name,job_location, job_qualifications, job_experience, job_primary_skill, job_description,  job_vacancy from Job_Profile as j, Job_Profile_job_location as l, Recruiter as r where r.emp_id = j.recruiter_ID and j.job_id=l.job_id and (j.job_name LIKE '%{}%') OR (j.job_type LIKE '%{}%') OR (j.job_description LIKE '%{}%');".format(keyword,keyword,keyword))
+            
+            # if only location is entered in the job search, then select those jobs where the keyword matches the company location
+            # by using LIKE clause and inner join on jobs and corresponding companies
+            elif location and (not keyword):
+                count_search = cur.execute("select job_name, job_type, emp_name,job_location, job_qualifications, job_experience, job_primary_skill, job_description,  job_vacancy from Job_Profile as j, Job_Profile_job_location as l, Recruiter as r where r.emp_id = j.recruiter_ID and j.job_id=l.job_id and (l.job_location LIKE '%{}%');".format(location))
+            
+            # if keyword and location are entered in the job search, then select those jobs where the keyword matches the job details
+            # and company location by using LIKE clause and inner join on jobs and corresponding companies
+            elif location and keyword:
+                count_search = cur.execute("select job_name, job_type, emp_name,job_location, job_qualifications, job_experience, job_primary_skill, job_description,  job_vacancy from Job_Profile as j, Job_Profile_job_location as l, Recruiter as r where r.emp_id = j.recruiter_ID and j.job_id=l.job_id and ((j.job_name LIKE '%{}%') OR (j.job_type LIKE '%{}%') OR (j.job_description LIKE '%{}%')) and (l.job_location LIKE '%{}%');".format(keyword,keyword,keyword,location))
+            else:
+                count_search = 0
+
+            jobsearch = cur.fetchall()
+            return render_template('display_search.html', jobsearch = jobsearch)
+        '''
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
+        cur=conn.cursor()
+        # display all jobs and their details by selecting all jobs of companies using inner join on job and company
+        count_jobs = cur.execute("SELECT job.job_title, job.job_type, company.name, company.location, job.job_salary, job.job_description, job.job_id FROM job INNER JOIN company ON job.company_id = company.company_id")
+        
+        if count_jobs > 0:
+            alljobs = cur.fetchall()'''
+        return render_template('search_jobs.html')
+    else:
+        return redirect(url_for('login'))
+
 @app.route('/home_cand', endpoint='cand_home', methods=['POST','GET'])
 def cand_home():
     if "user" in session:
@@ -402,7 +442,7 @@ def applyjob():
                 conn.commit()
                 cur.close()
                 conn.close()
-    return redirect('/home_cand')
+    return redirect('/jia_cand')
 
 @app.route('/resume_edit', endpoint='edit_resume', methods=["GET","POST"])
 def edit_resume():

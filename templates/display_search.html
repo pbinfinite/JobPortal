@@ -1,0 +1,30 @@
+{% extends "cand_navbar.html" %}
+{% block title %} Jobsearch-JobPortal {% endblock %}
+{% block content %}
+<br>
+<h3 class="text-sm-left" style="margin-left:20px;"> Search Results -  </h3>
+<br>
+{%if jobsearch %}
+{% for job in jobsearch %}
+<div class="card" style="margin: 5px 20px 5px;">
+  <h5 class="card-header">{{ job[0] }}</h5>
+  <div class="card-body">
+    <p class="card-title">Type : {{ job[1] }}</p>
+    <p class="card-text">Company : {{ job[2] }}</p>
+    <p class="card-text">Location : {{ job[3] }}</p>
+    <p class="card-text">Qualification : {{ job[4] }}</p>
+    <p class="card-text">Experience : {{ job[5] }}</p>
+    <p class="card-text">Skills Required : {{ job[6] }}</p>
+    
+    <p class="card-text">Job Description : <br> {{ job[7] }}</p>
+    <p class="card-text">Vacancy : {{ job[8] }}</p>
+    
+  </div>
+</div>
+<br>
+{% endfor %}
+{% else %}
+<p style="margin-left: 20px; font-size: 20px;">No search results found</p>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "cand_navbar.html" %}
+{% block title %} Jobs-JobPortal {% endblock %}>
+{% block content %}
+<!-- Search Jobs -->
+<br>
+<h3 class="text-sm-left" style="margin-left:40px;"> Search For Jobs </h3><br>
+<form method = "POST">
+  <div class="form-row">
+    <div class="col" >
+      <input type="text" class="form-control" style="width:600px; margin-left: 40px;" name = "keyword" placeholder="Keywords (Eg - Job Title / Category / Company )">
+    </div>
+    <div class="col">
+      <input type="text" class="form-control" name = "location" placeholder="Location">
+    </div>
+    <div class="col">
+    <button type="submit" class="btn btn-dark" style="margin-right: 40px;"> Search </button> 
+
+    </div>
+  </div>
+</form>
+{% endblock %}
