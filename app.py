@@ -143,8 +143,8 @@ def homepage():
     else:
         return "at home page"
 
-@app.route('/home_cand', endpoint='candidate_home', methods=['POST','GET'])
-def candidate_home():
+@app.route('/jia_cand', endpoint='candidate_jia', methods=['POST','GET'])
+def candidate_jia():
 
     conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
     cur=conn.cursor()
@@ -167,6 +167,21 @@ def candidate_home():
         conn.commit()
         cur.close()
         return render_template('candidate_page.html', recarr=recarr, intv = interviewarr, pending=pendingarr)
+
+@app.route('/home_cand', endpoint='cand_home', methods=['POST','GET'])
+def cand_home():
+    if "user" in session:
+        user = session["user"]
+        #print(user)
+        conn=psycopg2.connect(database='jobportal', user='postgres', password='P@rimala9', port=5432, host='127.0.0.1')
+        cur=conn.cursor()
+        # selecting jobseeker details to display the name of the jobseeker on the home page who is currently logged in
+        cur.execute("SELECT * FROM Candidate WHERE cand_login_username = '{}'".format(user))
+        userdet = cur.fetchall()
+        name = userdet[0][1]
+        return render_template('candidate_home.html', name = name)
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/home_rec', endpoint='rec_home', methods=['POST','GET'])
 def rec_home():
