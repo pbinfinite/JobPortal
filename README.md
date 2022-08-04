@@ -1,4 +1,4 @@
-# Job Portal
+# Hiring Corner
 <br>
 This website provides a platform for candidates to browse and apply for jobs. It also allows candidates to create and update their resume.<br><br>
 Recruiters can post employment opportunities and schedule interviews after going through the applications submitted.<br>
